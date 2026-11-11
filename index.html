@@ -31,27 +31,63 @@ function noise(dur=.12,vol=.12,filter=1400){try{if(!audio||muted)return;let n=Ma
 function sound(kind){if(muted)return;try{if(kind==='gun'){noise(.14,.24,1800);tone(180,.18,'square',.1,0,50)}else if(kind==='draw'){tone(660,.12,'square',.07);tone(990,.18,'square',.06,.12)}else if(kind==='fake'){tone(175,.55,'sawtooth',.06,0,120);tone(182,.48,'sine',.03,.03,145)}else if(kind==='oops'){tone(260,.12,'square',.07,0,90)}else if(kind==='heal'){[440,554,659,880].forEach((f,i)=>tone(f,.22,'triangle',.06,i*.1))}else if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,.28,'square',.05,i*.13))}else if(kind==='lose'){[392,330,262,196].forEach((f,i)=>tone(f,.32,'triangle',.06,i*.15))}else if(kind==='type')tone(780,.025,'square',.018);else if(kind==='wind')noise(.28,.012,450)}catch(_){}}
 function startMusic(){try{if(!audio||muted||musicTimer)return;let beat=0;const fast=level===9&&playerWins>0,bass=[98,0,98,0,110,0,110,0,87,0,87,0,82,0,98,0],lead=[392,0,440,494,0,587,494,0,440,0,392,330,0,392,440,0,523,0,494,440,0,392,330,0];musicTimer=setInterval(()=>{if(muted||!audio)return;let f=lead[beat%lead.length],b=bass[(beat>>1)%bass.length];if(beat%2===0&&b)tone(b,.28,'triangle',.028);if(f){tone(f,fast ? .19 : .22,'triangle',.022);tone(f,.16,'square',.009)}if(beat%8===0)tone(196,.32,'triangle',.02);beat++},fast?255:300)}catch(_){}}
 function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}}
-// SPRITES
-function drawSprite(x,y,who,opts={}){const boss=who==='BADE SAHAB',hero=who==='SHAUN',jasmine=who==='JASMINE',d=CONFIG.levels.find(q=>q.name===who),scale=boss?1.25:1,flip=!!opts.flip,frame=Math.floor(sceneTick/450)%2,fall=opts.fall||false,shoot=opts.shoot||false,still=d?.type==='still',short=who==='YASHI',lanky=who==='MISHAL';ctx.save();ctx.translate(Math.round(x),Math.round(y)+(still?0:(frame?0:-1))+(short?3:0));ctx.scale((flip?-1:1)*scale*(lanky ? .92 : 1),scale*(short ? .86 : lanky ? 1.08 : 1));let outfit=hero?PAL.brown:jasmine?PAL.white:PAL[d?.outfit]||PAL.red,skin=hero?PAL.wheat:jasmine?PAL.fair:d?.skin==='brown'?PAL.brownskin:d?.skin==='fair'?PAL.fair:PAL.wheat,hair=PAL.hair;
-function px(x0,y0,w,h,col){ctx.fillStyle=col;ctx.fillRect(x0,y0,w,h)}
-if(fall){ctx.translate(5,-3);ctx.rotate(-.6)}
-// legs/body silhouette
-const stocky=d?.name==='QUAYUM';px(stocky?5:7,24,stocky?5:4,7,PAL.dark);px(14,24,stocky?5:4,7,PAL.dark);px(5,30,7,2,PAL.leather);px(13,30,8,2,PAL.leather);px(stocky?4:6,15,stocky?17:14,stocky?11:10,outfit);px(4,16,4,7,skin);px(18,16,4,7,skin);if(d?.name==='RAYO'){px(6,16,4,7,outfit);px(17,16,4,7,outfit);px(8,16,3,6,skin);px(15,16,3,6,skin)}
-// torso detail and rosary
-if(hero){px(10,16,1,6,PAL.cream);px(13,16,1,6,PAL.cream);px(9,21,6,1,PAL.gold);px(12,22,1,3,PAL.cream);px(11,24,3,1,PAL.cream)}
-if(d?.type==='gym'){px(7,17,3,5,skin);px(16,17,3,5,skin);px(10,17,2,3,PAL.cream);px(14,17,2,3,PAL.cream)}
-if(d?.type==='quiet'){px(19,24,3,2,PAL.blue);px(19,23,4,1,PAL.cream)}if(d?.name==='QUAYUM'){px(18,22,4,3,PAL.blue);px(19,21,2,1,PAL.cream)}
-if(jasmine){px(5,14,4,14,PAL.hair);px(17,14,4,14,PAL.hair);px(9,18,8,1,PAL.red);px(11,18,1,3,PAL.red);px(17,19,2,2,PAL.gold);px(16,20,1,1,PAL.white);px(19,20,1,1,PAL.white);px(7,27,3,3,PAL.sand)}
-// head + hair
-px(8,6,12,10,skin);px(8,5,12,3,hair);if(d?.type==='cheeky'&&who==='ZUBIN'){px(7,8,2,3,PAL.orange);px(19,8,2,3,PAL.orange);px(6,6,2,2,PAL.orange);px(20,6,2,2,PAL.orange)}else if(!jasmine){px(8,5,12,2,hair)}
-px(10,10,1,1,PAL.ink);px(16,10,1,1,PAL.ink);if(d?.type==='gentle'){px(10,13,7,2,PAL.hair);px(7,13,4,1,PAL.hair);px(16,13,4,1,PAL.hair)}else if(who==='ALISTER'){px(10,13,7,2,PAL.hair);px(10,14,7,2,PAL.hair)}else px(12,14,4,1,PAL.brown);
-if(hero){px(11,6,6,1,PAL.dark);px(13,8,4,1,PAL.white)}
-// hats (Jasmine nurse hat)
-if(jasmine){px(7,3,14,3,PAL.white);px(6,5,16,1,PAL.red);px(13,3,1,3,PAL.red);px(12,4,3,1,PAL.red)}else{px(boss?3:5,2,boss?22:18,3,boss?PAL.black:outfit);px(boss?1:4,5,boss?26:20,2,boss?PAL.black:PAL.dark);px(9,0,10,3,boss?PAL.black:outfit);px(10,5,8,1,PAL.gold);}
-if(boss){px(18,12,4,1,PAL.orange);px(20,11,2,1,PAL.rust);if(playerWins>0){let gl=Math.sin(sceneTick/170)>0;px(10,10,2,1,gl?PAL.red:PAL.cream);px(16,10,2,1,gl?PAL.red:PAL.cream)}}
-if(boss){px(21,18,3,4,PAL.grey);px(22,18,2,2,PAL.white);px(20,13,2,1,PAL.orange);if(Math.floor(sceneTick/280)%3===0)px(22,8,1,2,PAL.grey)}if(d?.name==='MISHAL'){px(9,13,3,1,PAL.hair);px(16,13,3,1,PAL.hair)}
-if(shoot){px(20,18,5,2,PAL.grey);px(25,17,2,4,PAL.gold);px(27,17,2,2,PAL.yellow)}
-ctx.restore()}
+// SPRITES — layered, outlined pixel-art cowboys, drawn entirely from chunky canvas pixels.
+function drawSprite(x,y,who,opts={}){
+ const boss=who==='BADE SAHAB',hero=who==='SHAUN',jasmine=who==='JASMINE',d=CONFIG.levels.find(q=>q.name===who),flip=!!opts.flip,fall=!!opts.fall,shoot=!!opts.shoot,still=d?.type==='still',stocky=who==='QUAYUM'||who==='YASHI',short=who==='YASHI',lanky=who==='MISHAL',gym=who==='RAYO';
+ const scale=boss?1.22:1, bob=still?0:(Math.floor(sceneTick/430)%2?0:-1), outfit=hero?PAL.brown:jasmine?PAL.white:PAL[d?.outfit]||PAL.red, skin=hero?PAL.wheat:jasmine?PAL.fair:d?.skin==='brown'?PAL.brownskin:d?.skin==='fair'?PAL.fair:PAL.wheat;
+ const hair=hero?PAL.leather:boss?PAL.grey:PAL.hair, outline=PAL.ink, shade=hero?PAL.leather:boss?PAL.black:(outfit===PAL.white?PAL.grey:PAL.shadow), boot=hero?PAL.leather:boss?PAL.black:PAL.dark;
+ ctx.save();ctx.translate(Math.round(x),Math.round(y+bob+(short?4:0)));ctx.scale((flip?-1:1)*scale,scale*(short?.88:lanky?1.1:1));
+ if(fall){ctx.translate(7,2);ctx.rotate(-.62)}
+ const p=(a,b,w,h,col)=>{ctx.fillStyle=col;ctx.fillRect(a,b,w,h)};
+ // Drop shadow and boots, with crisp sole and spur highlights.
+ p(4,38,25,2,'#211a25');
+ p(7,29,7,9,outline);p(18,29,7,9,outline);p(5,35,9,4,boot);p(17,35,10,4,boot);p(5,38,10,1,PAL.ink);p(17,38,10,1,PAL.ink);
+ p(7,30,5,6,hero?PAL.brown:outfit);p(19,30,4,6,hero?PAL.brown:outfit);p(6,35,8,2,shade);p(18,35,8,2,shade);p(10,32,2,1,PAL.gold);p(22,32,2,1,PAL.gold);
+ // Trousers: a dark one-pixel contour, bright folded highlights and a high-waist belt.
+ p(stocky?5:8,23,stocky?21:16,11,outline);p(10,24,5,10,hero?PAL.sand:jasmine?PAL.white:PAL.paper);p(17,24,5,10,hero?PAL.sand:jasmine?PAL.white:PAL.paper);p(9,25,2,6,shade);p(21,25,2,6,shade);p(11,25,2,1,PAL.white);p(18,25,2,1,PAL.white);
+ p(stocky?5:8,22,stocky?21:16,3,outline);p(stocky?6:9,23,stocky?19:14,2,hero?PAL.dark:shade);p(15,23,3,2,PAL.gold);p(16,23,1,1,PAL.cream);
+ // Torso coat/vest with shoulder shaping, sleeve cuffs and lapel pixels.
+ const torsoX=stocky?4:7,torsoW=stocky?24:18;
+ p(torsoX,14,torsoW,11,outline);p(torsoX+2,14,torsoW-4,12,outfit);p(torsoX+3,15,3,8,shade);p(torsoX+torsoW-6,15,3,8,shade);
+ p(torsoX+5,15,2,7,hero?PAL.brown:outfit);p(torsoX+torsoW-7,15,2,7,hero?PAL.sand:outfit);
+ p(torsoX+2,22,torsoW-4,2,shade);p(torsoX+4,16,1,5,PAL.gold);p(torsoX+torsoW-5,16,1,5,PAL.gold);
+ // Arms, including Rayo's bare flexing arms and holster-ready hands.
+ p(3,15,6,9,outline);p(23,15,6,9,outline);
+ if(gym){p(4,16,4,6,skin);p(24,16,4,6,skin);p(4,16,2,2,PAL.fair);p(24,16,2,2,PAL.fair);p(4,22,4,2,outfit);p(24,22,4,2,outfit)}
+ else {p(4,16,4,7,outfit);p(24,16,4,7,outfit);p(4,21,4,3,shade);p(24,21,4,3,shade)}
+ p(4,23,4,3,outline);p(24,23,4,3,outline);p(5,23,2,2,skin);p(25,23,2,2,skin);
+ // Head, ears, hairline, eyes and expression.
+ p(9,4,14,13,outline);p(10,5,12,11,skin);p(8,8,2,4,skin);p(22,8,2,4,skin);
+ p(10,5,12,3,hair);p(11,6,8,1,hero?PAL.brown:hair);p(11,9,2,2,outline);p(18,9,2,2,outline);p(12,9,1,1,PAL.white);p(19,9,1,1,PAL.white);
+ p(15,11,2,2,d?.type==='loud'?PAL.gold:shade);p(14,14,5,1,outline);p(13,13,2,1,skin);p(19,13,2,1,skin);
+ if(hero){p(11,5,8,1,PAL.cream);p(12,7,7,1,PAL.white);p(12,15,8,1,PAL.cream)}
+ if(who==='ZUBIN'){p(8,7,2,3,outfit);p(7,6,2,3,PAL.orange);p(7,10,2,3,outfit);p(22,7,2,3,outfit);p(24,6,2,3,PAL.orange);p(23,10,2,3,outfit);p(10,3,3,2,PAL.orange);p(19,3,3,2,outfit)}
+ if(who==='MISHAL'){p(10,13,5,2,hair);p(18,13,5,2,hair);p(8,14,5,2,hair);p(20,14,5,2,hair);p(11,15,3,2,hair);p(20,15,3,2,hair)}
+ if(who==='ALISTER'){p(11,13,10,3,hair);p(12,15,8,2,hair);p(14,14,4,1,PAL.grey)}
+ if(jasmine){p(7,5,4,25,hair);p(21,5,4,25,hair);p(6,17,3,10,PAL.leather);p(5,25,4,5,PAL.brown);p(6,26,2,1,PAL.gold);p(11,16,10,2,PAL.red);p(13,16,3,6,PAL.red);p(15,17,2,2,PAL.white);p(14,18,4,1,PAL.white);p(23,19,1,2,PAL.gold);p(24,18,1,1,PAL.white)}
+ // Bandana, coat trim, rosary, medals and pocket details.
+ if(!jasmine&&!boss){p(11,14,10,3,d?.type==='gym'?PAL.white:outfit===PAL.red?PAL.orange:PAL.red);p(14,15,4,2,d?.type==='gym'?PAL.red:PAL.cream);p(17,16,2,3,PAL.gold)}
+ if(hero){p(13,16,1,1,PAL.cream);p(12,17,1,1,PAL.cream);p(11,18,1,1,PAL.gold);p(12,19,1,1,PAL.cream);p(13,20,1,1,PAL.cream);p(14,21,1,3,PAL.cream);p(12,24,5,1,PAL.cream);p(17,25,1,3,PAL.gold);p(18,26,3,1,PAL.gold);p(13,24,2,2,PAL.gold)}
+ if(who==='QUAYUM'){p(23,22,4,3,PAL.blue);p(24,21,2,1,PAL.cream);p(23,25,4,1,PAL.gold)}
+ if(who==='RAYO'){p(10,16,4,4,PAL.white);p(18,16,4,4,PAL.white);p(13,17,2,4,PAL.fair);p(18,21,2,1,PAL.gold)}
+ if(boss){p(7,14,18,13,outline);p(9,15,14,11,PAL.black);p(11,17,10,7,PAL.shadow);p(14,24,4,2,PAL.gold);p(15,24,2,1,PAL.cream);p(4,17,4,8,PAL.black);p(24,17,4,8,PAL.black);p(10,7,4,2,PAL.white);p(17,7,4,2,PAL.white);if(playerWins>0){const glow=Math.sin(sceneTick/130)>0?PAL.red:PAL.gold;p(12,10,3,2,glow);p(18,10,3,2,glow)}p(24,16,3,1,PAL.orange);p(26,15,2,2,PAL.rust);p(27,14,1,2,PAL.grey);p(27,12,1,2,PAL.grey);if(Math.floor(sceneTick/360)%3===0)p(28,10,2,2,PAL.grey);p(29,20,3,5,PAL.grey);p(29,20,3,1,PAL.white);p(29,25,3,1,PAL.gold)}
+ // Proper broad-brim hats with crown, band, buckle, stitch highlights and unique shapes.
+ if(jasmine){p(7,2,19,5,outline);p(8,2,17,3,PAL.white);p(6,5,21,2,PAL.red);p(13,2,6,3,PAL.white);p(15,2,2,3,PAL.red);p(14,3,4,1,PAL.white);p(10,5,12,1,PAL.cream)}
+ else {
+  const hat=hero?PAL.brown:boss?PAL.black:outfit, brimY=boss?4:4, brimW=boss?32:27, brimX=boss?0:3;
+  p(brimX,brimY,brimW,4,outline);p(brimX+2,brimY+1,brimW-4,2,boss?PAL.black:shade);p(8,0,17,7,outline);p(10,0,13,5,hat);p(11,1,8,1,boss?PAL.grey:PAL.sand);p(10,4,13,2,boss?PAL.black:shade);p(11,5,12,1,boss?PAL.gold:PAL.gold);p(16,5,3,2,PAL.cream);p(6,7,20,1,outline);p(8,4,2,1,PAL.cream);p(23,4,2,1,PAL.cream);
+  if(hero){p(5,0,3,1,PAL.white);p(4,-1,3,1,PAL.white);p(3,-2,3,1,PAL.white);p(2,-3,3,1,PAL.white);p(2,-4,2,1,PAL.white);p(3,-5,2,1,PAL.cream);p(5,-4,2,1,PAL.white);p(6,-2,2,1,PAL.white);p(7,0,2,1,PAL.cream)}
+  if(who==='RAYO'){p(10,2,12,1,PAL.grey);p(8,5,17,1,PAL.white)}
+  if(who==='MISHAL'){p(12,0,10,1,PAL.cream);p(8,6,17,1,PAL.gold)}
+  if(who==='BADE SAHAB'){p(8,0,17,1,PAL.grey);p(9,6,15,1,PAL.grey)}
+ }
+ // Holster and confident six-shooter; the muzzle flashes only in the shoot pose.
+ p(23,22,4,5,outline);p(24,22,2,4,boot);p(24,25,3,1,PAL.gold);
+ if(shoot){p(25,18,6,3,outline);p(27,19,6,1,PAL.grey);p(32,18,2,3,PAL.gold);p(34,17,3,5,PAL.yellow);p(35,16,2,1,PAL.white);p(36,19,2,1,PAL.orange)}
+ if(d?.type==='gym'&&!still&&Math.floor(sceneTick/180)%2===0&&!shoot){p(26,13,3,2,skin);p(26,12,2,2,outline);p(27,12,2,1,PAL.fair)}
+ if(still){p(27,15,2,1,PAL.fair)}
+ ctx.restore();
+}
 // STATE MACHINE
 function changeState(next){state=next;stateToken++;sceneTick=0;return stateToken}
 function later(ms,fn){const tok=stateToken;setTimeout(()=>{if(tok===stateToken)fn()},ms)}
